@@ -1,4 +1,4 @@
-# ComfyUI on RDNA2 `gfx1030`
+# comfy-compatible-amd-linux
 
 This project started with a practical question: how can someone run ComfyUI comfortably on an AMD RDNA2 card without having to guess which parts of an NVIDIA-focused guide still apply? The reference machine is built around two Radeon Pro V620 cards, but the useful part of the project is the reasoning behind the setup: how ROCm, PyTorch, ComfyUI, model files, and GPU selection fit together.
 
@@ -62,18 +62,28 @@ The workflow and model files come from the official upstream sources listed in [
 
 The helper script does not install ROCm, does not download model weights, and does not copy private output destinations. That is intentional: these choices depend on the host, the model license, and how the operator wants to manage storage.
 
-### Use the interactive installer
+### Experimental installer
 
-Download or copy `setup-comfy.sh`, make it executable, and run it as your normal user:
+`setup-comfy.sh` is an experimental convenience layer around the official `comfy-cli`. It is intended to make the tested AMD setup comfortable for a human to operate, but it is not the authoritative ComfyUI installer and it should not be treated as a replacement for the official CLI documentation.
+
+If you want a standard, transparent installation, follow the official [ComfyUI manual installation guide](https://docs.comfy.org/installation/manual_install) and the official [`comfy-cli` getting-started guide](https://docs.comfy.org/comfy-cli/getting-started). The Arch and Ubuntu documents in this repository explain how those official instructions map to ROCm-backed AMD systems.
+
+If you want to try the convenience installer, download the repository archive and run it as your normal user. This keeps the installer beside the bundled example workflow:
 
 ```bash
+curl -fsSL https://github.com/GeekyBit/comfy-compatible-amd-linux/archive/refs/heads/main.tar.gz | tar -xz --strip-components=1 && chmod +x setup-comfy.sh && ./setup-comfy.sh
+```
+
+You can inspect the repository before running it instead:
+
+```bash
+git clone https://github.com/GeekyBit/comfy-compatible-amd-linux.git
+cd comfy-compatible-amd-linux
 chmod +x setup-comfy.sh
 ./setup-comfy.sh
 ```
 
-The installer places the command at `$HOME/.local/bin/comfy`. If that directory is not already in your `PATH`, it tells you how to add it or you can open a new shell after installation.
-
-The script walks through the setup in plain questions. It asks where the user-run ComfyUI application should be stored, which GPU ComfyUI should see, where models and generated output should live, whether the web page is local to the system or reachable from the local network, and whether the tested idle-CPU workaround should be enabled. It creates a private Python environment for `comfy-cli`, installs the selected ComfyUI version, checks for ROCm-enabled PyTorch, and copies the bundled example workflows without downloading their model files.
+The installer walks through the setup in plain questions. It asks where the user-run ComfyUI application should be stored, which GPU ComfyUI should see, where models and generated output should live, whether the web page is local to the system or reachable from the local network, and whether the tested idle-CPU workaround should be enabled. It creates a private Python environment for `comfy-cli`, installs the selected ComfyUI version, checks for ROCm-enabled PyTorch, and copies the bundled example workflows without downloading their model files.
 
 The installer checks for Bash, Python with venv support, Git, curl, ROCm, `rocminfo`, `/dev/kfd`, and a render device. If something is missing, it stops and explains what needs to be installed. It does not silently install system packages or use `sudo` for application setup.
 
@@ -93,6 +103,8 @@ comfy -help
 Local-system mode binds ComfyUI to `127.0.0.1`. Local-network mode lists the host's available LAN addresses, lets the user choose one, reports the browser URL, and checks for an active UFW or firewalld installation. When a firewall is present, the setup asks before adding a rule for the configured port. Existing firewall rules are not silently removed when switching back to local-only mode.
 
 `comfy -update` updates ComfyUI itself while preserving ROCm, PyTorch, model files, and custom nodes. It backs up the launcher configuration, stops ComfyUI if necessary, runs the official `comfy-cli` ComfyUI update, and starts the service again if it was running before the update.
+
+The installer places the `comfy` command at `$HOME/.local/bin/comfy`. If that directory is not already in `PATH`, the installer prints the command needed to add it or you can open a new shell.
 
 The application remains user-run. You do not need to run ComfyUI with `sudo`. If you want it to start automatically when you log in, `comfy -setup` can create a systemd user service and leaves it disabled unless you explicitly enable it.
 
@@ -193,6 +205,12 @@ export COMFY_CLI="$HOME/.venvs/comfy-cli/bin/comfy"
 ## Security
 
 Bind to `127.0.0.1` unless remote access is explicitly needed. If remote LAN access is required, bind to the host's LAN address and allow only the trusted LAN or specific client IP in the firewall. ComfyUI authentication was not configured in the reference installation; do not expose an unauthenticated instance directly to the public Internet.
+
+## License
+
+Original installer and documentation files in this repository are copyright (c) GeekyBit and are provided under the [Mozilla Public License 2.0](LICENSE).
+
+This license allows commercial use and private modification while requiring distributed modifications to MPL-covered files to remain available under the MPL. It does not change the licenses of ComfyUI, `comfy-cli`, ROCm, PyTorch, model files, or workflow material obtained from other projects. Check the relevant upstream license before redistributing third-party material.
 
 ## Version policy
 
