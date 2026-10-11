@@ -16,7 +16,8 @@ The files are deliberately organized so that a reader can start with the overvie
 |---|---|
 | `README.md` | Explains the project's goal, reference hardware, tested software stack, architecture, simple setup path, and document map. |
 | `setup-comfy.sh` | Interactive Bash installer that creates one user-run ComfyUI command, checks prerequisites without installing missing system packages, configures storage and web access, and optionally creates a user startup service. It does not download model weights. |
-| `examples/image_z_image_turbo.json` | Bundled example workflow copied into the ComfyUI workflow area during installation. It describes a workflow; it does not include the model weights. |
+| `examples/README.md` | Identifies the upstream owner, source, and MIT license for the bundled example workflow. |
+| `examples/image_z_image_turbo.json` | Unchanged Comfy-Org example workflow copied into the ComfyUI workflow area during installation. It does not include model weights. |
 | `docs/ARCH-LINUX.md` | Reproduces the tested Arch/CachyOS-style installation using the official `comfy-cli` workflow. |
 | `docs/UBUNTU-SERVER.md` | Adapts the same approach to Ubuntu Server while keeping ROCm and Python compatibility explicit. |
 | `docs/GPU-ISOLATION.md` | Explains `HIP_VISIBLE_DEVICES`, dual-GPU assignment, verification, launch templates, and the idle-CPU workaround. |
